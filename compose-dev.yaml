@@ -9,7 +9,5 @@ services:
       - type: bind
         source: /var/run/docker.sock
         target: /var/run/docker.sock
-    depends_on:
-      - db
     ports:
       - "4000:4000"
