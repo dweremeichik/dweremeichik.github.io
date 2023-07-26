@@ -1,0 +1,10 @@
+<p>While operating my partnership (Pinnath LLC), I worked with one of our customers to design and develop a burn room visualizer for emergency service training. The product I developed made it possible to visualize multiple rooms in a burn scenario from a top down view as if you were looking at a thermal imaging camera. The system also provided playback and data logging for further anyalisys. </p>
+
+<p>The tools I used for this project were primarly in the Javascript family.</p>
+<ul>
+<li>TypeScript</li>
+<li>Vue.js</li>
+<li>Koa (ES6 Express)</li>
+<li>Raspberry Pi platform (as an embedded device)</li>
+</ul>
+<p>I also wrote firmware to communicate with the LT... device via SPI utilizing TypeScript (it can be done).</p>
