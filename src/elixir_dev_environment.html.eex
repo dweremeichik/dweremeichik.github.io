@@ -1,0 +1,50 @@
+<p>I use <a href="https://docs.docker.com/desktop/dev-environments/set-up/">Docker Dev Environments</a> to develop with Elixr. For the most part it seems to be cleaner than using a different Elixir version manager on my Windows desktop verses my Linux laptop. I chose to use Docker Dev Environments over VSCode Dev Containers because Docker simply renames a compose file to <code>compose-dev.yaml</code> where VSCode adds a plethora of unecessary requirements on top. At the end of the day, both solutions end up using Docker.</p>
+<h2>Setup</h2>
+<p>To get set up, you will need a <code>compose-dev.yaml</code> file and a <code>Dockerfile</code>.</p>
+<details open>
+    <summary>compose-dev.yaml</summary>
+    <pre><code>services:
+    backend:
+        build: .
+        entrypoint:
+            - sleep
+            - infinity
+        init: true
+        volumes:
+        - type: bind
+            source: /var/run/docker.sock
+            target: /var/run/docker.sock
+        depends_on:
+        - db
+        ports:
+        - "4000:4000"
+    db:
+        image: postgres:15.3
+        restart: always
+        environment:
+        POSTGRES_PASSWORD: postgres
+        POSTGRES_DB: some_database_name
+        healthcheck:
+        test: ["CMD", "pg_isready"]
+        interval: 10s
+        timeout: 45s
+        retries: 10</code></pre>
+</details>
+<details open>
+    <summary>Dockerfile</summary>
+    <pre><code>FROM hexpm/elixir:1.15.2-erlang-26.0.2-debian-bookworm-20230612-slim as backend
+
+RUN apt-get -y update
+RUN apt-get -y install git inotify-tools curl
+
+RUN apt-get clean
+
+RUN mix local.hex --force
+RUN mix archive.install hex phx_new --force
+</code></pre>
+</details>
+<p>The <code>Dockerfile</code> creates a service (image/container) that you can customize. In this example, I name it "backend" see the end of the first line "<code>as backend</code>". The <code>compose-dev.yaml</code> file lists the services & dependencies that we need to start. Because I use Phoenix framework, I start my "backend" service (image/container) and it automatically starts the Postgres Database. See the <code>depends_on</code> line.</p>
+<h3>VS Code Git Integration</h3>
+<p>Rob O'Leary has a <a href="https://www.roboleary.net/vscode/2020/09/15/vscode-git.html">great article</a> on getting VS Code to work nicely with Git. You may need to run <code>git config --global core.editor 'code --wait'</code> first as your docker environment may not have an editor set.</p>
+<h3>Port forwarding</h3>
+<p>On Linux, this just seems to work as it should. If you are using Windows though, make sure your server is running on 0.0.0.0 instead of 127.0.0.1. For Phoenix this is set in <code>config/dev.exs</code> as <code>http: [ip: {0, 0, 0, 0}, port: 4000]</code>.</p>
